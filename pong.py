@@ -156,7 +156,7 @@ p2Score = 0
 textFont = pygame.font.Font("freesansbold.ttf", 32)
 
 #Countdown score timer
-score_time = None
+score_time = True
 
 
 while True:
