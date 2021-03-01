@@ -22,8 +22,27 @@ def ball_animation():
         score_time = pygame.time.get_ticks()
 
     #paddle Collison
-    if ball.colliderect(player1) or ball.colliderect(player2):
-        ballSpdX *= -1
+    #Voodoo magic causes this to work, dont ask me to explain it plz :)#
+    if ball.colliderect(player1) and ballSpdX < 0:  
+        if abs(ball.left - player1.right) < 10:
+            ballSpdX *= -1
+        elif abs(ball.bottom - player1.top) < 10 and ballSpdY > 10:
+                ballSpdY *= -1
+        elif abs(ball.top - player1.bottom) < 10 and ballSpdY < 10:
+                ballSpdY *= -1    
+
+    if ball.colliderect(player2) and ballSpdX > 0:
+        if abs(ball.right - player2.left) < 10:
+            ballSpdX *= -1   
+        elif abs(ball.bottom - player2.top) < 10 and ballSpdY > 10:
+            ballSpdY *= -1
+        elif abs(ball.top - player2.bottom) < 10 and ballSpdY < 10:
+                ballSpdY *= -1
+
+
+    
+
+     
 
 
 def user_input():
@@ -190,4 +209,5 @@ while True:
     #updating the window
     pygame.display.flip()
     clock.tick(60)        
+
 
