@@ -1,213 +1,106 @@
 import pygame, sys, random
+from ball_functions import ball_animation, ball_reset
+from player_functions import player_animation, user_input
 
-
-def ball_animation():
-    global ballSpdX, ballSpdY, p1Score, p2Score, score_time
-    ball.x += ballSpdX
-    ball.y += ballSpdY
-
-    #collision logic
-    if ball.top <= 0 or ball.bottom >= screenHeight:
-        #negatively reverse the ball speed (i.e. cause it to bounce)
-        ballSpdY *= -1
-
-    #P2 scores a goal
-    if ball.left <= 0:
-        p2Score += 1
-        score_time = pygame.time.get_ticks()
-    
-    #P1 scores a goal
-    if ball.right >= screenWidth:
-        p1Score += 1
-        score_time = pygame.time.get_ticks()
-
-    #paddle Collison
-    #Voodoo magic causes this to work, dont ask me to explain it plz :)#
-    if ball.colliderect(player1) and ballSpdX < 0:  
-        if abs(ball.left - player1.right) < 10:
-            ballSpdX *= -1
-        elif abs(ball.bottom - player1.top) < 10 and ballSpdY > 10:
-                ballSpdY *= -1
-        elif abs(ball.top - player1.bottom) < 10 and ballSpdY < 10:
-                ballSpdY *= -1    
-
-    if ball.colliderect(player2) and ballSpdX > 0:
-        if abs(ball.right - player2.left) < 10:
-            ballSpdX *= -1   
-        elif abs(ball.bottom - player2.top) < 10 and ballSpdY > 10:
-            ballSpdY *= -1
-        elif abs(ball.top - player2.bottom) < 10 and ballSpdY < 10:
-                ballSpdY *= -1
-
-
-    
-
-     
-
-
-def user_input():
-    #Handle user input
-    global p1Speed, p2Speed
-
-    player1.y += p1Speed
-    player2.y += p2Speed
-
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-
-        #if the key has been pressed down increase the player speed
-        #depending on direction
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_DOWN:
-                #move down
-                p2Speed += 7
-            if event.key == pygame.K_UP:
-                #move up
-                p2Speed -= 7
-            if event.key == pygame.K_s:
-                #move down
-                p1Speed += 7
-            if event.key == pygame.K_w:
-                #move up
-                p1Speed -= 7
-
-        #if the key has been released revert the speed back by the amount
-        #it was increased by
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_DOWN:
-                #move down
-                p2Speed -= 7
-            if event.key == pygame.K_UP:
-                #move up
-                p2Speed += 7
-            if event.key == pygame.K_s:
-                #move down
-                p1Speed -= 7
-            if event.key == pygame.K_w:
-                #move up
-                p1Speed += 7                
-
-def player_animation():
-    if player1.top <= 0:
-        player1.top = 0
-
-    if player1.bottom >= screenHeight:
-        player1.bottom = screenHeight    
-
-    if player2.top <= 0:
-        player2.top = 0
-
-    if player2.bottom >= screenHeight:
-        player2.bottom = screenHeight    
-
-
-def ball_reset():
-    global ballSpdX, ballSpdY, score_time, textFont
-    current_time = pygame.time.get_ticks()
-    ball.center = (screenWidth/2, screenHeight/2)
-
-    #prints 2
-    if(current_time - score_time < 700):
-        num3 = textFont.render("3", True, white)
-        display.blit(num3,(screenWidth/2 - 10, screenHeight/2 + 30))
-        
-    if 700 < (current_time - score_time) < 1400:
-        num2 = textFont.render("2", True, white)
-        display.blit(num2,(screenWidth/2 - 10, screenHeight/2 + 30))
-      
-    if 1400 < (current_time - score_time) < 2100:
-        num1 = textFont.render("1", True, white)
-        display.blit(num1,(screenWidth/2 - 10, screenHeight/2 + 30))
-         
-
-    #creates a 2.1 second delay where the ball speed = 0 before setting it back to the normal X and Y speeds
-    if(current_time - score_time < 2100):
-        ballSpdX, ballSpdY = 0,0
-    else:
-        ballSpdX, ballSpdY = 7 * random.choice((1,-1)),7 * random.choice((1,-1)) 
-        score_time = None
-
-
-   
-
-
-
-#set up pygame
+# Initialize pygame
 pygame.init()
-clock = pygame.time.Clock()
 
+# UI settings
+SCREEN_SIZE = [1600, 900]
+SCREEN_CAPTION = "Pong"
+CENTER_RADIUS = 25
 
-#Setup for the main window to be fullscreen
-screenWidth = 1600
-screenHeight = 900
-display = pygame.display.set_mode((screenWidth,screenHeight))
-pygame.display.set_caption("Pong")
+# Geometry settings
+BALL_RADIUS = 15
+PADDLE_SIZE = [10, 140]
 
+# Colors
+BG_COLOR = pygame.Color("gray12")
+WHITE = pygame.Color("gray100")
+GREY = pygame.Color("gray71")
 
-#Create the ball
-#/2 - 15 to get the exact midpoint of our screen
-#the ball is created as a rectangle but drawn as an ellipse
-ball = pygame.Rect(screenWidth/2 - 15, screenHeight/2 - 15, 30,30)
-player1 = pygame.Rect(10, screenHeight/2 - 70,10,140)
-player2 = pygame.Rect(screenWidth - 20,screenHeight/2 - 70,10,140)
-center = pygame.Rect(screenWidth/2 - 25,screenHeight/2 - 25,50,50)
-
-
-#colors for the objects
-backgroundColor = pygame.Color("grey12")
-white = pygame.Color("gray100")
-grey = pygame.Color("gray71")
-
-#ball speed 
-ballSpdX = 7 * random.choice((1,-1))
-ballSpdY = 7 * random.choice((1,-1))
-
-#initial player speed before moving (change movement speed in user_input() if wanted)
-p1Speed = 0
-p2Speed = 0
-
-#On screen text 
-p1Score = 0
-p2Score = 0
-textFont = pygame.font.Font("freesansbold.ttf", 32)
-
-#Countdown score timer
+# Game settings
 score_time = True
+ball_speed_x = 7 * random.choice((1,-1))
+ball_speed_y = 7 * random.choice((1,-1))
+p1_speed, p2_speed, p1_score, p2_score = 0, 0, 0, 0
+TEXT_FONT = pygame.font.Font("freesansbold.ttf", 32)
+player1_text = TEXT_FONT.render(f"{p1_score}", True, WHITE)
+player2_text = TEXT_FONT.render(f"{p2_score}", True, WHITE)
 
+# Particles
+particles = []
 
-while True:
+# Pygame config
+clock = pygame.time.Clock()
+display = pygame.display.set_mode((SCREEN_SIZE[0], SCREEN_SIZE[1]))
+pygame.display.set_caption(SCREEN_CAPTION)
 
-    user_input()
-    player_animation()
-    ball_animation()
-    
-    #Draw visuals
-    display.fill(backgroundColor)
+def game_loop(ball, player1, player2, center):
+    global p1_speed, p2_speed, p1_score, p2_score, ball_speed_x, ball_speed_y, score_time, WHITE
+    while True:
 
+        p1_speed, p2_speed = user_input(p1_speed, p2_speed)
+        player1.y += p1_speed
+        player2.y += p2_speed
 
-    pygame.draw.aaline(display,white,(screenWidth/2,0),(screenWidth/2, screenHeight))
-    pygame.draw.ellipse(display,grey,center)
+        player_positions = player_animation(player1, player2, SCREEN_SIZE)
+        if player_positions[0] != -1:
+            player1.top = player_positions[0]
+        if player_positions[1] != -1:
+            player1.bottom = player_positions[1]
+        if player_positions[2] != -1:
+            player2.top = player_positions[2]
+        if player_positions[3] != -1:
+            player2.bottom = player_positions[3]
 
-    pygame.draw.rect(display, white, player1)
-    pygame.draw.rect(display, white, player2) 
-    pygame.draw.ellipse(display, white, ball)
+        ball_speed_x, ball_speed_y, p1_score, p2_score, score_time = ball_animation(ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE)
+        ball.x += ball_speed_x
+        ball.y += ball_speed_y
 
-    #the ball has collided with the left/right side of the screen
-    if score_time:
-        ball_reset()
-  
+        #Draw visuals
+        display.fill(BG_COLOR)
 
-    player1_text = textFont.render(f"{p1Score}",True,white)
-    player2_text = textFont.render(f"{p2Score}",True,white)
-    display.blit(player1_text,(735,470))
-    display.blit(player2_text,(850,470))
+        pygame.draw.aaline(display, WHITE, (SCREEN_SIZE[0]/2, 0),
+                            (SCREEN_SIZE[0]/2, SCREEN_SIZE[1]))
 
+        pygame.draw.ellipse(display, GREY, center)
+        pygame.draw.rect(display, WHITE, player1)
+        pygame.draw.rect(display, WHITE, player2)
+        pygame.draw.ellipse(display, WHITE, ball)
 
-    #updating the window
-    pygame.display.flip()
-    clock.tick(60)        
+        # the ball has collided with the left/right side of the screen
+        if score_time:
+            ball_speed_x, ball_speed_y, score_time = ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE)
 
+        player1_text = TEXT_FONT.render(f"{p1_score}", True, WHITE)
+        player2_text = TEXT_FONT.render(f"{p2_score}", True, WHITE)
+        display.blit(player1_text,(735,470))
+        display.blit(player2_text,(850,470))
 
+        #updating the window
+        pygame.display.update()
+        clock.tick(80)
+
+if __name__ == "__main__":
+
+    # Create the ball and center it
+    ball = pygame.Rect(SCREEN_SIZE[0]/2 - BALL_RADIUS,
+                       SCREEN_SIZE[1]/2 - BALL_RADIUS,
+                       BALL_RADIUS*2, BALL_RADIUS*2)
+
+    # Create the player paddles
+    player1 = pygame.Rect(PADDLE_SIZE[0],
+                          SCREEN_SIZE[1]/2 - PADDLE_SIZE[1]/2,
+                          PADDLE_SIZE[0], PADDLE_SIZE[1])
+
+    player2 = pygame.Rect(SCREEN_SIZE[0] - PADDLE_SIZE[0]*2,
+                          SCREEN_SIZE[1]/2 - PADDLE_SIZE[1]/2,
+                          PADDLE_SIZE[0], PADDLE_SIZE[1])
+
+    # Create the starting point for the ball
+    center = pygame.Rect(SCREEN_SIZE[0]/2 - CENTER_RADIUS,
+                         SCREEN_SIZE[1]/2 - CENTER_RADIUS,
+                         CENTER_RADIUS*2, CENTER_RADIUS*2)
+
+    game_loop(ball, player1, player2, center)
