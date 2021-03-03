@@ -41,10 +41,14 @@ display = pygame.display.set_mode((SCREEN_SIZE[0], SCREEN_SIZE[1]))
 pygame.display.set_caption(SCREEN_CAPTION)
 
 def opponent_ai():
-    if player2.top <= ball.y:
-        player2.top += p2_speed
-    if player2.bottom >= ball.y:
-        player2.bottom -= p2_speed
+    if player2.center[1] < ball.center[1]:
+        center = list(player2.center)
+        center[1] += p2_speed
+        player2.center = center
+    elif player2.center[1] > ball.center[1]:
+        center = list(player2.center)
+        center[1] -= p2_speed
+        player2.center = center
     if player2.top <= 0:
         player2.top = 0
     if player2.bottom >= SCREEN_SIZE[1]:
@@ -59,9 +63,9 @@ def game_loop(ball, player1, player2, center):
         player1.y += p1_speed
 
         #ai speed
-        p2_speed = 5
+        p2_speed = 10
         #ai position method
-        opponent_ai()
+        opponent_ai();
 
         player_positions = player_animation(player1, player2, SCREEN_SIZE)
         if player_positions[0] != -1:

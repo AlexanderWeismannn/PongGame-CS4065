@@ -27,8 +27,6 @@ def ball_animation(ball, player1, player2, ball_speed_x, ball_speed_y, p1_score,
         previous_collide = -1
         if (abs((ball.left - player1.right) < 10)) or (abs((ball.center - player1.right) < 10)) or (abs((ball.right - player1.right) < 10)):
             ball_speed_x -= speed_mult
-            print(f"LINE 30 ball_speed_x: {ball_speed_x}")
-            print(f"ball_speed_x + speed_mult: {ball_speed_x + speed_mult}")
             ball_speed_x *= -1
         elif abs(ball.bottom - player1.top) < 10 and ball_speed_y > 10:
             ball_speed_y -= speed_mult
@@ -40,8 +38,6 @@ def ball_animation(ball, player1, player2, ball_speed_x, ball_speed_y, p1_score,
     if (previous_collide != 1) and (ball.colliderect(player2) and ball_speed_x > 0):
         previous_collide = 1
         if (abs((ball.right - player2.right) < 10)) or (abs((ball.center - player2.right) < 10)) or (abs((ball.left - player2.right) < 10)):
-            print(f"LINE 43 ball_speed_x: {ball_speed_x}")
-            print(f"ball_speed_x + speed_mult: {ball_speed_x + speed_mult}")
             ball_speed_x += speed_mult
             ball_speed_x *= -1
         elif abs(ball.bottom - player2.top) < 10 and ball_speed_y > 10:
