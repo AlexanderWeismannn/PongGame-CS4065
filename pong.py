@@ -2,6 +2,7 @@ import pygame, sys, random
 from ball_functions import ball_animation, ball_reset
 from player_functions import player_animation, user_input
 
+
 # Initialize pygame
 pygame.init()
 
@@ -36,23 +37,38 @@ clock = pygame.time.Clock()
 display = pygame.display.set_mode((SCREEN_SIZE[0], SCREEN_SIZE[1]))
 pygame.display.set_caption(SCREEN_CAPTION)
 
+def opponent_ai():
+    if player2.top <= ball.y:
+        player2.top += p2_speed
+    if player2.bottom >= ball.y:
+        player2.bottom -= p2_speed
+    if player2.top <= 0:
+        player2.top = 0        
+    if player2.bottom >= SCREEN_SIZE[1]:
+        player2.bottom = SCREEN_SIZE[1]
+    
+
 def game_loop(ball, player1, player2, center):
     global p1_speed, p2_speed, p1_score, p2_score, ball_speed_x, ball_speed_y, score_time, WHITE
     while True:
 
-        p1_speed, p2_speed = user_input(p1_speed, p2_speed)
+        p1_speed = user_input(p1_speed)
         player1.y += p1_speed
-        player2.y += p2_speed
 
+        #ai speed
+        p2_speed = 10
+        #ai position method
+        opponent_ai();
+
+       
+
+    
         player_positions = player_animation(player1, player2, SCREEN_SIZE)
         if player_positions[0] != -1:
             player1.top = player_positions[0]
         if player_positions[1] != -1:
             player1.bottom = player_positions[1]
-        if player_positions[2] != -1:
-            player2.top = player_positions[2]
-        if player_positions[3] != -1:
-            player2.bottom = player_positions[3]
+
 
         ball_speed_x, ball_speed_y, p1_score, p2_score, score_time = ball_animation(ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE)
         ball.x += ball_speed_x
