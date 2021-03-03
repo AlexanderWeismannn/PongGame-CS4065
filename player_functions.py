@@ -24,9 +24,6 @@ def user_input(p1_speed):
             pygame.quit()
             sys.exit()
 
-
-          
-
         #if the key has been pressed down increase the player speed
         #depending on direction
         if event.type == pygame.KEYDOWN:

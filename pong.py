@@ -21,9 +21,12 @@ WHITE = pygame.Color("gray100")
 GREY = pygame.Color("gray71")
 
 # Game settings
+GAME_SPEED = 80
 score_time = True
-ball_speed_x = 7 * random.choice((1,-1))
-ball_speed_y = 7 * random.choice((1,-1))
+speed_constant = 7
+speed_mult = 2
+ball_speed_x = speed_constant * random.choice((1,-1))
+ball_speed_y = speed_constant * random.choice((1,-1))
 p1_speed, p2_speed, p1_score, p2_score = 0, 0, 0, 0
 TEXT_FONT = pygame.font.Font("freesansbold.ttf", 32)
 player1_text = TEXT_FONT.render(f"{p1_score}", True, WHITE)
@@ -43,37 +46,32 @@ def opponent_ai():
     if player2.bottom >= ball.y:
         player2.bottom -= p2_speed
     if player2.top <= 0:
-        player2.top = 0        
+        player2.top = 0
     if player2.bottom >= SCREEN_SIZE[1]:
         player2.bottom = SCREEN_SIZE[1]
-    
+
 
 def game_loop(ball, player1, player2, center):
-    global p1_speed, p2_speed, p1_score, p2_score, ball_speed_x, ball_speed_y, score_time, WHITE
+    global p1_speed, p2_speed, p1_score, p2_score, ball_speed_x, ball_speed_y, score_time, WHITE, speed_mult
     while True:
 
         p1_speed = user_input(p1_speed)
         player1.y += p1_speed
 
         #ai speed
-        p2_speed = 10
+        p2_speed = 5
         #ai position method
-        opponent_ai();
+        opponent_ai()
 
-       
-
-    
         player_positions = player_animation(player1, player2, SCREEN_SIZE)
         if player_positions[0] != -1:
             player1.top = player_positions[0]
         if player_positions[1] != -1:
             player1.bottom = player_positions[1]
 
-
-        ball_speed_x, ball_speed_y, p1_score, p2_score, score_time = ball_animation(ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE)
+        ball_speed_x, ball_speed_y, p1_score, p2_score, score_time = ball_animation(ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE, speed_mult)
         ball.x += ball_speed_x
         ball.y += ball_speed_y
-
         #Draw visuals
         display.fill(BG_COLOR)
 
@@ -87,7 +85,7 @@ def game_loop(ball, player1, player2, center):
 
         # the ball has collided with the left/right side of the screen
         if score_time:
-            ball_speed_x, ball_speed_y, score_time = ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE)
+            ball_speed_x, ball_speed_y, score_time = ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE, speed_constant)
 
         player1_text = TEXT_FONT.render(f"{p1_score}", True, WHITE)
         player2_text = TEXT_FONT.render(f"{p2_score}", True, WHITE)
@@ -96,7 +94,7 @@ def game_loop(ball, player1, player2, center):
 
         #updating the window
         pygame.display.update()
-        clock.tick(80)
+        clock.tick(GAME_SPEED)
 
 if __name__ == "__main__":
 

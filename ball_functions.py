@@ -1,7 +1,7 @@
 import pygame, sys, random
 from pygame.locals import *
 
-def ball_animation(ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE):
+def ball_animation(ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE, speed_mult):
 
     #collision logic
     if ball.top <= 0 or ball.bottom >= SCREEN_SIZE[1]:
@@ -21,25 +21,39 @@ def ball_animation(ball, player1, player2, ball_speed_x, ball_speed_y, p1_score,
     #paddle Collison
     #Voodoo magic causes this to work, dont ask me to explain it plz :)#
 
-    if ball.colliderect(player1) and ball_speed_x < 0:
-        if abs(ball.left - player1.right) < 10:
+    previous_collide = 0
+
+    if (previous_collide != -1) and (ball.colliderect(player1) and ball_speed_x < 0):
+        previous_collide = -1
+        if (abs((ball.left - player1.right) < 10)) or (abs((ball.center - player1.right) < 10)) or (abs((ball.right - player1.right) < 10)):
+            ball_speed_x -= speed_mult
+            print(f"LINE 30 ball_speed_x: {ball_speed_x}")
+            print(f"ball_speed_x + speed_mult: {ball_speed_x + speed_mult}")
             ball_speed_x *= -1
         elif abs(ball.bottom - player1.top) < 10 and ball_speed_y > 10:
-                ball_speed_y *= -1
+            ball_speed_y -= speed_mult
+            ball_speed_y *= -1
         elif abs(ball.top - player1.bottom) < 10 and ball_speed_y < 10:
-                ball_speed_y *= -1
+            ball_speed_y -= speed_mult
+            ball_speed_y *= -1
 
-    if ball.colliderect(player2) and ball_speed_x > 0:
-        if abs(ball.right - player2.left) < 10:
+    if (previous_collide != 1) and (ball.colliderect(player2) and ball_speed_x > 0):
+        previous_collide = 1
+        if (abs((ball.right - player2.right) < 10)) or (abs((ball.center - player2.right) < 10)) or (abs((ball.left - player2.right) < 10)):
+            print(f"LINE 43 ball_speed_x: {ball_speed_x}")
+            print(f"ball_speed_x + speed_mult: {ball_speed_x + speed_mult}")
+            ball_speed_x += speed_mult
             ball_speed_x *= -1
         elif abs(ball.bottom - player2.top) < 10 and ball_speed_y > 10:
+            ball_speed_y += speed_mult
             ball_speed_y *= -1
         elif abs(ball.top - player2.bottom) < 10 and ball_speed_y < 10:
+            ball_speed_y += speed_mult
             ball_speed_y *= -1
 
     return ball_speed_x, ball_speed_y, p1_score, p2_score, score_time
 
-def ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE):
+def ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE, speed_constant):
     current_time = pygame.time.get_ticks()
     ball.center = (SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2)
 
@@ -56,7 +70,7 @@ def ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT,
     if(current_time - score_time < 2100):
         ball_speed_x, ball_speed_y = 0,0
     else:
-        ball_speed_x, ball_speed_y = 7 * random.choice((1,-1)),7 * random.choice((1,-1))
+        ball_speed_x, ball_speed_y = speed_constant * random.choice((1,-1)), speed_constant * random.choice((1,-1))
         score_time = None
 
     return ball_speed_x, ball_speed_y, score_time
