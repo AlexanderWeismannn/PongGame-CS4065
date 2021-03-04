@@ -15,7 +15,7 @@ CENTER_RADIUS = 25
 
 # Geometry settings
 BALL_RADIUS = 15
-PADDLE_SIZE = [10, 120]
+PADDLE_SIZE = [25, 120]
 
 # Colors
 BG_COLOR = pygame.Color("gray12")
@@ -26,7 +26,7 @@ GREY = pygame.Color("gray71")
 GAME_SPEED = 80
 score_time = True
 speed_constant = 8
-speed_mult = 0.5
+speed_mult = 1.000001
 ball_speed_x = speed_constant * random.choice((1,-1))
 ball_speed_y = speed_constant * random.choice((1,-1))
 p1_speed, p2_speed, p1_score, p2_score = 0, 0, 0, 0
