@@ -50,7 +50,7 @@ def opponent_ai():
         player2.center = center
     elif player2.center[1] > ball.center[1]:
         center = list(player2.center)
-        center[1] -= p2_speedS
+        center[1] -= p2_speed
         player2.center = center
     if player2.top <= 0:
         player2.top = 0
