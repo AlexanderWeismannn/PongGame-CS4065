@@ -27,6 +27,7 @@ def ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y
     previous_collide = 0
 
     if (previous_collide != -1) and (ball.colliderect(player1) and ball_speed_x < 0):
+        pygame.mixer.music.play(0, 0.0, 0)
         collision = -1
         previous_collide = -1
         if (abs((ball.left - player1.right) < 10)) or (abs((ball.center - player1.right) < 10)) or (abs((ball.right - player1.right) < 10)):
@@ -40,6 +41,7 @@ def ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y
             ball_speed_y *= -1
 
     if (previous_collide != 1) and (ball.colliderect(player2) and ball_speed_x > 0):
+        pygame.mixer.music.play(0, 0.0, 0)
         collision = 1
         previous_collide = 1
         if (abs((ball.right - player2.right) < 10)) or (abs((ball.center - player2.right) < 10)) or (abs((ball.left - player2.right) < 10)):
@@ -61,10 +63,10 @@ def ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT,
     if(current_time - score_time < 700):
         display.blit(TEXT_FONT.render("3", True, WHITE), (SCREEN_SIZE[0]/2 - 10, SCREEN_SIZE[1]/2 + 30))
 
-    if 700 < (current_time - score_time) < 1400:
+    elif 700 < (current_time - score_time) < 1400:
         display.blit(TEXT_FONT.render("2", True, WHITE), (SCREEN_SIZE[0]/2 - 10, SCREEN_SIZE[1]/2 + 30))
 
-    if 1400 < (current_time - score_time) < 2100:
+    elif 1400 < (current_time - score_time) < 2100:
         display.blit(TEXT_FONT.render("1", True, WHITE), (SCREEN_SIZE[0]/2 - 10, SCREEN_SIZE[1]/2 + 30))
 
     #creates a 2.1 second delay where the ball speed = 0 before setting it back to the normal X and Y speeds
