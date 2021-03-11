@@ -21,6 +21,7 @@ PADDLE_SIZE = [25, 120]
 BG_COLOR = pygame.Color("gray12")
 WHITE = pygame.Color("gray100")
 GREY = pygame.Color("gray71")
+BLACK = pygame.Color("black")
 
 # Game settings
 GAME_SPEED = 80
@@ -38,10 +39,11 @@ player2_text = TEXT_FONT.render(f"{p2_score}", True, WHITE)
 particles = []
 paddle_particles = []
 
-# Pygame config
+#Pygame config
 clock = pygame.time.Clock()
 display = pygame.display.set_mode((SCREEN_SIZE[0], SCREEN_SIZE[1]))
 pygame.display.set_caption(SCREEN_CAPTION)
+
 
 def opponent_ai():
     if player2.center[1] < ball.center[1]:
@@ -56,6 +58,36 @@ def opponent_ai():
         player2.top = 0
     if player2.bottom >= SCREEN_SIZE[1]:
         player2.bottom = SCREEN_SIZE[1]
+
+
+def start_screen():
+    print("IN START SCREEN")
+
+    intro_img = pygame.image.load("introduction.png")
+    while True:
+
+        #Draw visuals
+        display.fill(BLACK)
+        intro_text = TEXT_FONT.render("WELCOME TO OUR EXPERIMENT!", True, WHITE)
+        intro_text_2 = TEXT_FONT.render("please read the instructions below carefully", True, WHITE)
+        display.blit(intro_text,[SCREEN_SIZE[0] * 0.35, SCREEN_SIZE[1] * 0.15])
+        display.blit(intro_text_2,[SCREEN_SIZE[0]/2 * 0.60, SCREEN_SIZE[1] * 0.25 ])
+        display.blit(intro_img, [SCREEN_SIZE[0] * 0.26, SCREEN_SIZE[1] * 0.35] )
+
+        #updating the window
+        pygame.display.flip()
+        clock.tick(GAME_SPEED)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN: 
+                if event.key == pygame.K_RETURN:
+                    game_loop(ball,player1,player2,center)
+
+    
+
 
 
 def game_loop(ball, player1, player2, center):
@@ -110,6 +142,7 @@ def game_loop(ball, player1, player2, center):
         pygame.display.update()
         clock.tick(GAME_SPEED)
 
+  
 if __name__ == "__main__":
 
     pygame.mixer.init()
@@ -133,5 +166,6 @@ if __name__ == "__main__":
     center = pygame.Rect(SCREEN_SIZE[0]/2 - CENTER_RADIUS,
                          SCREEN_SIZE[1]/2 - CENTER_RADIUS,
                          CENTER_RADIUS*2, CENTER_RADIUS*2)
-
-    game_loop(ball, player1, player2, center)
+    #call the start screen first                     
+    start_screen()
+   
