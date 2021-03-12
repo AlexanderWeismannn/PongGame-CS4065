@@ -87,6 +87,28 @@ def start_screen():
                     game_loop(ball,player1,player2,center)
 
     
+def pause_screen():
+    print("IN PAUSE SCREEN")
+    display.fill(BLACK)
+    pause_text = TEXT_FONT.render("BREAK SCREEN", True, WHITE)
+    pause_text_2 = TEXT_FONT.render("press [ENTER] to continue", True, WHITE)
+    display.blit(pause_text,[SCREEN_SIZE[0] * 0.42, SCREEN_SIZE[1] * 0.15])
+    display.blit(pause_text_2,[SCREEN_SIZE[0] * 0.36, SCREEN_SIZE[1] * 0.25 ])
+
+    while True:
+
+        #updating the window
+        pygame.display.flip()
+        clock.tick(GAME_SPEED)
+
+        for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN: 
+                    if event.key == pygame.K_RETURN:
+                        game_loop(ball,player1,player2,center)
+
 
 
 
@@ -137,6 +159,13 @@ def game_loop(ball, player1, player2, center):
         player2_text = TEXT_FONT.render(f"{p2_score}", True, WHITE)
         display.blit(player1_text,(735,470))
         display.blit(player2_text,(850,470))
+
+        #TEST FOR THE BREAK SCREEN
+        if p1_score >= 1 or p2_score >= 1:
+            p1_score,p2_score = 0,0
+            pause_screen()
+
+
 
         #updating the window
         pygame.display.update()
