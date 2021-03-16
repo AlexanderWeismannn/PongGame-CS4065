@@ -5,6 +5,17 @@ from player_functions import player_animation, user_input
 from particles import *
 
 
+"""
+Potential idea:
+Advantage scales from Level 1 advantage to level 3
+Level 1: Paddle can get 20% larger
+Level 2: Paddle can get 40% larger
+Level 3: Paddle can get 60% larger
+
+This way we're measuring both the effect of the advantage, as well as how far
+the advantage can be pushed before the player notices.
+"""
+
 # Initialize pygame
 pygame.init()
 STARTING = True
@@ -24,9 +35,19 @@ WHITE = pygame.Color("gray100")
 GREY = pygame.Color("gray71")
 BLACK = pygame.Color("black")
 
+# Data Collection
+current_set = 1 # Implemented
+player_set_wins = 0 # Implemented
+player_round_wins = 0 # Implemented
+
+# TODO: Currently this is vollies / returns per set, not round. Must change to round
+number_of_vollies = 0 # Implemented
+player_returns = 0 # Implemented
+
 # Game settings
+Advantage_level = 3
 GAME_SPEED = 80
-score_per_round = 1
+score_per_round = 3
 score_time = True
 speed_constant = 8
 speed_mult = 1.000001
@@ -79,8 +100,8 @@ def start_screen():
         pygame.display.flip()
         clock.tick(GAME_SPEED)
 
-        
-    
+
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -90,12 +111,32 @@ def start_screen():
                 #originally the value goes outside of the screen space and breaks player control if held before movement is allowed.
                 if event.key == pygame.K_RETURN and (pygame.key.get_pressed()[K_w] == False) and (pygame.key.get_pressed()[K_s] == False):
                     game_loop(ball,player1,player2,center)
-                
-
 
 
 def pause_screen():
+    global player_returns, p1_speed, number_of_vollies, current_set, player_round_wins, player_set_wins, player1
+
+    # Reset player
+    player1.height = PADDLE_SIZE[1]
+
     print("IN PAUSE SCREEN")
+    print(f"Finished set: {current_set}")
+    print(f"Player return count for previous round: {player_returns}")
+    print(f"Volley count: {number_of_vollies}")
+    print(f"Rounds won by player: {player_round_wins}")
+    print(f"Did player win the set? {player_round_wins >= score_per_round}")
+
+    if player_round_wins >= score_per_round:
+        player_set_wins += 1
+
+    print(f"Total sets won by player: {player_set_wins}")
+
+    p1_speed = 0
+    current_set += 1
+    player_returns = 0
+    number_of_vollies = 0
+    player_round_wins = 0
+
     display.fill(BLACK)
     pause_text = TEXT_FONT.render("BREAK SCREEN", True, WHITE)
     pause_text_2 = TEXT_FONT.render("press [ENTER] to continue", True, WHITE)
@@ -119,14 +160,14 @@ def pause_screen():
 
 
 def game_loop(ball, player1, player2, center):
-    global p1_speed, p2_speed, p1_score, p2_score, ball_speed_x, ball_speed_y, score_time, WHITE, speed_mult, STARTING
+    global p1_speed, p2_speed, p1_score, p2_score, ball_speed_x, ball_speed_y, score_time, WHITE, speed_mult, STARTING, player_returns, player_round_wins, number_of_vollies, Advantage_level, PADDLE_SIZE
     animate = False
     collision = 0
     if STARTING:
         score_time = pygame.time.get_ticks()
         STARTING = False
     while True:
-        
+
         p1_speed = user_input(p1_speed)
         player1.y += p1_speed
 
@@ -141,7 +182,7 @@ def game_loop(ball, player1, player2, center):
         if player_positions[1] != -1:
             player1.bottom = player_positions[1]
 
-        ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, collision = ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE, speed_mult)
+        ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, collision, player_returns, number_of_vollies, player_round_wins, player1 = ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE, speed_mult, player_returns, number_of_vollies, player_round_wins, Advantage_level)
         ball.x += ball_speed_x
         ball.y += ball_speed_y
 
@@ -163,7 +204,7 @@ def game_loop(ball, player1, player2, center):
         # the ball has collided with the left/right side of the screen
         if score_time:
             animate = False
-            ball_speed_x, ball_speed_y, score_time, animate = ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE, speed_constant, animate)
+            ball_speed_x, ball_speed_y, score_time, animate, player1 = ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE, speed_constant, animate, player1, PADDLE_SIZE[1])
 
         player1_text = TEXT_FONT.render(f"{p1_score}", True, WHITE)
         player2_text = TEXT_FONT.render(f"{p2_score}", True, WHITE)
@@ -172,6 +213,7 @@ def game_loop(ball, player1, player2, center):
 
         #TEST FOR THE BREAK SCREEN
         if p1_score >= score_per_round or p2_score >= score_per_round:
+            print("test")
             p1_score,p2_score = 0,0
             pause_screen()
             score_time = pygame.time.get_ticks()
