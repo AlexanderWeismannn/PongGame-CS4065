@@ -57,6 +57,7 @@ def ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y
     return ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, collision
 
 def ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE, speed_constant, animate):
+    
     current_time = pygame.time.get_ticks()
     ball.center = (SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2)
 

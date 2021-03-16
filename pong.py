@@ -79,13 +79,19 @@ def start_screen():
         pygame.display.flip()
         clock.tick(GAME_SPEED)
 
+        
+    
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
+                #makes sure that the player can only hit enter and doesnt allow for other keys to be pressed at the same time
+                #originally the value goes outside of the screen space and breaks player control if held before movement is allowed.
+                if event.key == pygame.K_RETURN and (pygame.key.get_pressed()[K_w] == False) and (pygame.key.get_pressed()[K_s] == False):
                     game_loop(ball,player1,player2,center)
+                
+
 
 
 def pause_screen():
@@ -107,7 +113,8 @@ def pause_screen():
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
+                    if event.key == pygame.K_RETURN and (pygame.key.get_pressed()[K_w] == False) and (pygame.key.get_pressed()[K_s] == False):
+                        pygame.event.clear(None)
                         return
 
 
@@ -119,7 +126,7 @@ def game_loop(ball, player1, player2, center):
         score_time = pygame.time.get_ticks()
         STARTING = False
     while True:
-
+        
         p1_speed = user_input(p1_speed)
         player1.y += p1_speed
 
