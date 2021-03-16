@@ -7,6 +7,7 @@ from particles import *
 
 # Initialize pygame
 pygame.init()
+STARTING = True
 
 # UI settings
 SCREEN_SIZE = [1600, 900]
@@ -25,6 +26,7 @@ BLACK = pygame.Color("black")
 
 # Game settings
 GAME_SPEED = 80
+score_per_round = 1
 score_time = True
 speed_constant = 8
 speed_mult = 1.000001
@@ -62,7 +64,6 @@ def opponent_ai():
 
 def start_screen():
     print("IN START SCREEN")
-
     intro_img = pygame.image.load("introduction.png")
     while True:
 
@@ -82,11 +83,11 @@ def start_screen():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN: 
+            if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     game_loop(ball,player1,player2,center)
 
-    
+
 def pause_screen():
     print("IN PAUSE SCREEN")
     display.fill(BLACK)
@@ -105,24 +106,25 @@ def pause_screen():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if event.type == pygame.KEYDOWN: 
+                if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        game_loop(ball,player1,player2,center)
-
-
+                        return
 
 
 def game_loop(ball, player1, player2, center):
-    global p1_speed, p2_speed, p1_score, p2_score, ball_speed_x, ball_speed_y, score_time, WHITE, speed_mult
+    global p1_speed, p2_speed, p1_score, p2_score, ball_speed_x, ball_speed_y, score_time, WHITE, speed_mult, STARTING
     animate = False
     collision = 0
+    if STARTING:
+        score_time = pygame.time.get_ticks()
+        STARTING = False
     while True:
 
         p1_speed = user_input(p1_speed)
         player1.y += p1_speed
 
         #ai speed(WARNING: DO NOT GO PAST 8! ITS THE NUMBER OF THE BEAST. I SERIOUSLY CAN'T BEAT IT ONCE AT 8. AT 8 IT CAN PERFECTLY COVER THE ENTIRE GOAL)
-        p2_speed = 8
+        p2_speed = 7.999
         #ai position method
         opponent_ai()
 
@@ -155,23 +157,23 @@ def game_loop(ball, player1, player2, center):
         if score_time:
             animate = False
             ball_speed_x, ball_speed_y, score_time, animate = ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE, speed_constant, animate)
+
         player1_text = TEXT_FONT.render(f"{p1_score}", True, WHITE)
         player2_text = TEXT_FONT.render(f"{p2_score}", True, WHITE)
         display.blit(player1_text,(735,470))
         display.blit(player2_text,(850,470))
 
         #TEST FOR THE BREAK SCREEN
-        if p1_score >= 1 or p2_score >= 1:
+        if p1_score >= score_per_round or p2_score >= score_per_round:
             p1_score,p2_score = 0,0
             pause_screen()
-
-
+            score_time = pygame.time.get_ticks()
 
         #updating the window
         pygame.display.update()
         clock.tick(GAME_SPEED)
 
-  
+
 if __name__ == "__main__":
 
     pygame.mixer.init()
@@ -195,6 +197,5 @@ if __name__ == "__main__":
     center = pygame.Rect(SCREEN_SIZE[0]/2 - CENTER_RADIUS,
                          SCREEN_SIZE[1]/2 - CENTER_RADIUS,
                          CENTER_RADIUS*2, CENTER_RADIUS*2)
-    #call the start screen first                     
+    #call the start screen first
     start_screen()
-   
