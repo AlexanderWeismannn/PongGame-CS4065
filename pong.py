@@ -45,9 +45,9 @@ number_of_vollies = 0 # Implemented
 player_returns = 0 # Implemented
 
 # Game settings
-Advantage_level = 3
+Advantage_level = 0
 GAME_SPEED = 80
-score_per_round = 3
+score_per_round = 1
 score_time = True
 speed_constant = 8
 speed_mult = 1.000001
@@ -116,10 +116,13 @@ def start_screen():
 def pause_screen():
     global player_returns, p1_speed, number_of_vollies, current_set, player_round_wins, player_set_wins, player1
 
+  
+
     # Reset player
     player1.height = PADDLE_SIZE[1]
 
     print("IN PAUSE SCREEN")
+    print(f"Advantage Level: {Advantage_level}")
     print(f"Finished set: {current_set}")
     print(f"Player return count for previous round: {player_returns}")
     print(f"Volley count: {number_of_vollies}")
@@ -139,9 +142,9 @@ def pause_screen():
 
     display.fill(BLACK)
     pause_text = TEXT_FONT.render("BREAK SCREEN", True, WHITE)
-    pause_text_2 = TEXT_FONT.render("press [ENTER] to continue", True, WHITE)
+    pause_text_2 = TEXT_FONT.render("press [ENTER] to continue when ready", True, WHITE)
     display.blit(pause_text,[SCREEN_SIZE[0] * 0.42, SCREEN_SIZE[1] * 0.15])
-    display.blit(pause_text_2,[SCREEN_SIZE[0] * 0.36, SCREEN_SIZE[1] * 0.25 ])
+    display.blit(pause_text_2,[SCREEN_SIZE[0] * 0.31, SCREEN_SIZE[1] * 0.25 ])
 
     while True:
 
@@ -157,6 +160,52 @@ def pause_screen():
                     if event.key == pygame.K_RETURN and (pygame.key.get_pressed()[K_w] == False) and (pygame.key.get_pressed()[K_s] == False):
                         pygame.event.clear(None)
                         return
+
+def end_screen():
+    global player_returns, p1_speed, number_of_vollies, current_set, player_round_wins, player_set_wins, player1
+
+    # Reset player
+    player1.height = PADDLE_SIZE[1]
+
+    print("IN END SCREEN")
+    print(f"Finished set: {current_set}")
+    print(f"Player return count for previous round: {player_returns}")
+    print(f"Volley count: {number_of_vollies}")
+    print(f"Rounds won by player: {player_round_wins}")
+    print(f"Did player win the set? {player_round_wins >= score_per_round}")
+
+    if player_round_wins >= score_per_round:
+        player_set_wins += 1
+
+    print(f"Total sets won by player: {player_set_wins}")
+
+    p1_speed = 0
+    current_set += 1
+    player_returns = 0
+    number_of_vollies = 0
+    player_round_wins = 0
+
+    display.fill(BLACK)
+    pause_text = TEXT_FONT.render("THE END", True, WHITE)
+    pause_text_2 = TEXT_FONT.render("Press [ENTER] to exit", True, WHITE)
+    display.blit(pause_text,[SCREEN_SIZE[0] * 0.45, SCREEN_SIZE[1] * 0.15])
+    display.blit(pause_text_2,[SCREEN_SIZE[0] * 0.39, SCREEN_SIZE[1] * 0.25 ])
+
+    while True:
+        #updating the window
+        pygame.display.flip()
+        clock.tick(GAME_SPEED)
+
+        for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN and (pygame.key.get_pressed()[K_w] == False) and (pygame.key.get_pressed()[K_s] == False):
+                        pygame.quit()
+                        sys.exit()
+                        
+
 
 
 def game_loop(ball, player1, player2, center):
@@ -213,9 +262,15 @@ def game_loop(ball, player1, player2, center):
 
         #TEST FOR THE BREAK SCREEN
         if p1_score >= score_per_round or p2_score >= score_per_round:
-            print("test")
             p1_score,p2_score = 0,0
-            pause_screen()
+            Advantage_level += 1
+
+            if Advantage_level <= 3:
+                pause_screen()
+            else:
+                end_screen()
+           
+            
             score_time = pygame.time.get_ticks()
 
         #updating the window
