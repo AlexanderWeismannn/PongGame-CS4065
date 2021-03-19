@@ -6,8 +6,8 @@ from particles import *
 
 
 """
-Potential idea:
-Advantage scales from Level 1 advantage to level 3
+Level 0: Test round, no advantages, no data collection
+Level 0.5: No advantages, with data collection
 Level 1: Paddle can get 20% larger
 Level 2: Paddle can get 40% larger
 Level 3: Paddle can get 60% larger
@@ -39,15 +39,16 @@ BLACK = pygame.Color("black")
 current_set = 1 # Implemented
 player_set_wins = 0 # Implemented
 player_round_wins = 0 # Implemented
+score_per_round = 0 # Implemented
 
 # TODO: Currently this is vollies / returns per set, not round. Must change to round
 number_of_vollies = 0 # Implemented
 player_returns = 0 # Implemented
 
 # Game settings
+points_per_set = 2
 Advantage_level = 0
 GAME_SPEED = 80
-score_per_round = 1
 score_time = True
 speed_constant = 8
 speed_mult = 1.000001
@@ -116,7 +117,7 @@ def start_screen():
 def pause_screen():
     global player_returns, p1_speed, number_of_vollies, current_set, player_round_wins, player_set_wins, player1
 
-  
+
 
     # Reset player
     player1.height = PADDLE_SIZE[1]
@@ -204,12 +205,13 @@ def end_screen():
                     if event.key == pygame.K_RETURN and (pygame.key.get_pressed()[K_w] == False) and (pygame.key.get_pressed()[K_s] == False):
                         pygame.quit()
                         sys.exit()
-                        
+
 
 
 
 def game_loop(ball, player1, player2, center):
     global p1_speed, p2_speed, p1_score, p2_score, ball_speed_x, ball_speed_y, score_time, WHITE, speed_mult, STARTING, player_returns, player_round_wins, number_of_vollies, Advantage_level, PADDLE_SIZE
+    test_round = True
     animate = False
     collision = 0
     if STARTING:
@@ -261,16 +263,20 @@ def game_loop(ball, player1, player2, center):
         display.blit(player2_text,(850,470))
 
         #TEST FOR THE BREAK SCREEN
-        if p1_score >= score_per_round or p2_score >= score_per_round:
+        if p1_score >= points_per_set or p2_score >= points_per_set:
             p1_score,p2_score = 0,0
-            Advantage_level += 1
+
+            if test_round:
+                test_round = False
+            else:
+                Advantage_level += 1
 
             if Advantage_level <= 3:
                 pause_screen()
             else:
                 end_screen()
-           
-            
+
+
             score_time = pygame.time.get_ticks()
 
         #updating the window
