@@ -74,7 +74,7 @@ def ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y
 
     return ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, collision, player_returns, number_of_vollies, player_round_wins, player1
 
-def ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE, speed_constant, animate, player1, size):
+def ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE, speed_constant, animate, player1, size, p1_score, p2_score):
 
     if (player1.height > size):
         if (player1.height - 10 < size):
@@ -86,9 +86,15 @@ def ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT,
     ball.center = (SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2)
 
     if(current_time - score_time < 700):
-        display.blit(TEXT_FONT.render("3", True, WHITE), (SCREEN_SIZE[0]/2 - 10, SCREEN_SIZE[1]/2 + 30))
+        #if its the start of the round dont display goal
+        if p1_score == 0 and p2_score == 0 :
+            display.blit(TEXT_FONT.render("3", True, WHITE), (SCREEN_SIZE[0]/2 - 10, SCREEN_SIZE[1]/2 + 30))
+        else: 
+            display.blit(TEXT_FONT.render("3", True, WHITE), (SCREEN_SIZE[0]/2 - 10, SCREEN_SIZE[1]/2 + 30))   
+            display.blit(TEXT_FONT.render("GOAL!", True, WHITE), (SCREEN_SIZE[0]/2 - 50, SCREEN_SIZE[1]/2 - 60))
+        
 
-    elif 700 < (current_time - score_time) < 1400:
+    elif 700 < (current_time - score_time) < 1400:   
         display.blit(TEXT_FONT.render("2", True, WHITE), (SCREEN_SIZE[0]/2 - 10, SCREEN_SIZE[1]/2 + 30))
 
     elif 1400 < (current_time - score_time) < 2100:

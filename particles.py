@@ -25,14 +25,7 @@ def particle_animation(display, ball, collision, particles, animate):
             particle[1][1] += 0.1
             # if particle[3] == False:
             pygame.draw.circle(display, particle[3], [int(particle[0][0]), int(particle[0][1])], int(particle[2]))
-            # else:
-            #     if random.randint(1,5) == 1:
-            #         r,g,b = 255,255,255
-            #         pygame.draw.circle(display, (r,g,b), [int(particle[0][0]), int(particle[0][1])], int(particle[2]))
-            #     else:
-            #         r,g,b = random.randint(0,255),random.randint(0,255),random.randint(0,255)
-            #         pygame.draw.circle(display, (r,g,b), [int(particle[0][0]), int(particle[0][1])], int(particle[2]))
-
+          
             if particle[2] <= 0:
                 particles.remove(particle)
     else:

@@ -4,7 +4,6 @@ from ball_functions import ball_animation, ball_reset
 from player_functions import player_animation, user_input
 from particles import *
 
-
 """
 Level 0: Test round, no advantages, no data collection
 Level 0.5: No advantages, with data collection
@@ -255,7 +254,7 @@ def game_loop(ball, player1, player2, center):
         # the ball has collided with the left/right side of the screen
         if score_time:
             animate = False
-            ball_speed_x, ball_speed_y, score_time, animate, player1 = ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE, speed_constant, animate, player1, PADDLE_SIZE[1])
+            ball_speed_x, ball_speed_y, score_time, animate, player1 = ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE, speed_constant, animate, player1, PADDLE_SIZE[1], p1_score, p2_score)
 
         player1_text = TEXT_FONT.render(f"{p1_score}", True, WHITE)
         player2_text = TEXT_FONT.render(f"{p2_score}", True, WHITE)

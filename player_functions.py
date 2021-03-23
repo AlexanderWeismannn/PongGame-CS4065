@@ -27,12 +27,7 @@ def user_input(p1_speed):
         #if the key has been pressed down increase the player speed
         #depending on direction
         if event.type == pygame.KEYDOWN:
-            # if event.key == pygame.K_DOWN:
-            #     #move down
-            #     p2_speed += 7
-            # if event.key == pygame.K_UP:
-            #     #move up
-            #     p2_speed -= 7
+            
             if event.key == pygame.K_s:
                 #move down
                 p1_speed += 10
@@ -43,12 +38,7 @@ def user_input(p1_speed):
         #if the key has been released revert the speed back by the amount
         #it was increased by
         if event.type == pygame.KEYUP:
-            # if event.key == pygame.K_DOWN:
-            #     #move down
-            #     p2_speed -= 7
-            # if event.key == pygame.K_UP:
-            #     #move up
-            #     p2_speed += 7
+         
             if event.key == pygame.K_s:
                 #move down
                 p1_speed -= 10
