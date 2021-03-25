@@ -210,8 +210,10 @@ def end_screen():
 
 def game_loop(ball, player1, player2, center):
     global p1_speed, p2_speed, p1_score, p2_score, ball_speed_x, ball_speed_y, score_time, WHITE, speed_mult, STARTING, player_returns, player_round_wins, number_of_vollies, Advantage_level, PADDLE_SIZE
+    game_sounds['bg_music'].play(-1)
     test_round = True
     animate = False
+    goal_sound = True
     collision = 0
     if STARTING:
         score_time = pygame.time.get_ticks()
@@ -222,7 +224,8 @@ def game_loop(ball, player1, player2, center):
         player1.y += p1_speed
 
         #ai speed(WARNING: DO NOT GO PAST 8! ITS THE NUMBER OF THE BEAST. I SERIOUSLY CAN'T BEAT IT ONCE AT 8. AT 8 IT CAN PERFECTLY COVER THE ENTIRE GOAL)
-        p2_speed = 7.999
+        # p2_speed = 7.999
+        p2_speed = 8
         #ai position method
         opponent_ai()
 
@@ -232,7 +235,7 @@ def game_loop(ball, player1, player2, center):
         if player_positions[1] != -1:
             player1.bottom = player_positions[1]
 
-        ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, collision, player_returns, number_of_vollies, player_round_wins, player1 = ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE, speed_mult, player_returns, number_of_vollies, player_round_wins, Advantage_level)
+        ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, collision, player_returns, number_of_vollies, player_round_wins, player1 = ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE, speed_mult, player_returns, number_of_vollies, player_round_wins, Advantage_level, game_sounds)
         ball.x += ball_speed_x
         ball.y += ball_speed_y
 
@@ -254,7 +257,10 @@ def game_loop(ball, player1, player2, center):
         # the ball has collided with the left/right side of the screen
         if score_time:
             animate = False
-            ball_speed_x, ball_speed_y, score_time, animate, player1 = ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE, speed_constant, animate, player1, PADDLE_SIZE[1], p1_score, p2_score)
+            if (p1_score > 0 or p2_score > 0) and goal_sound:
+                goal_sound = False
+                game_sounds['goal_sound'].play()
+            ball_speed_x, ball_speed_y, score_time, animate, player1, goal_sound = ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE, speed_constant, animate, player1, PADDLE_SIZE[1], p1_score, p2_score, game_sounds, goal_sound)
 
         player1_text = TEXT_FONT.render(f"{p1_score}", True, WHITE)
         player2_text = TEXT_FONT.render(f"{p2_score}", True, WHITE)
@@ -271,7 +277,9 @@ def game_loop(ball, player1, player2, center):
                 Advantage_level += 1
 
             if Advantage_level <= 3:
+                game_sounds['bg_music'].stop()
                 pause_screen()
+                game_sounds['bg_music'].play(-1)
             else:
                 end_screen()
 
@@ -285,8 +293,13 @@ def game_loop(ball, player1, player2, center):
 
 if __name__ == "__main__":
 
-    pygame.mixer.init()
-    pygame.mixer.music.load("paddle.mp3")
+    # Initialize sounds
+    paddle_sound = pygame.mixer.Sound('paddle.mp3')
+    goal_sound = pygame.mixer.Sound('goal.mp3')
+    bg_music = pygame.mixer.Sound('music.mp3')
+    game_sounds = {"paddle_sound": paddle_sound,
+                "goal_sound": goal_sound,
+                "bg_music": bg_music}
 
     # Create the ball and center it
     ball = pygame.Rect(SCREEN_SIZE[0]/2 - BALL_RADIUS,
