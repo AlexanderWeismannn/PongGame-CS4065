@@ -1,8 +1,8 @@
 import pygame, sys, random
 from pygame.locals import *
-from ball_functions import ball_animation, ball_reset
-from player_functions import player_animation, user_input
-from particles import *
+from data.ball_functions import ball_animation, ball_reset
+from data.player_functions import player_animation, user_input
+from data.particles import *
 
 """
 Level 0: Test round, no advantages, no data collection
@@ -34,16 +34,6 @@ WHITE = pygame.Color("gray100")
 GREY = pygame.Color("gray71")
 BLACK = pygame.Color("black")
 
-# Data Collection
-current_set = 1 # Implemented
-player_set_wins = 0 # Implemented
-player_round_wins = 0 # Implemented
-score_per_round = 0 # Implemented
-
-# TODO: Currently this is vollies / returns per set, not round. Must change to round
-number_of_vollies = 0 # Implemented
-player_returns = 0 # Implemented
-
 # Game settings
 points_per_set = 2
 Advantage_level = 0
@@ -57,6 +47,16 @@ p1_speed, p2_speed, p1_score, p2_score = 0, 0, 0, 0
 TEXT_FONT = pygame.font.Font("freesansbold.ttf", 32)
 player1_text = TEXT_FONT.render(f"{p1_score}", True, WHITE)
 player2_text = TEXT_FONT.render(f"{p2_score}", True, WHITE)
+
+# Data collection
+session_data = {"global_data": {"current_set": 0,
+                                "player_set_wins": 0},
+                "set_0": {},
+                "set_1": {},
+                "set_2": {},
+                "set_3": {}}
+
+round_data = [0, 0, 0, 0]
 
 #Particles
 particles = []
@@ -85,7 +85,7 @@ def opponent_ai():
 
 def start_screen():
     print("IN START SCREEN")
-    intro_img = pygame.image.load("introduction.png")
+    intro_img = pygame.image.load("data/introduction.png")
     while True:
 
         #Draw visuals
@@ -101,7 +101,6 @@ def start_screen():
         clock.tick(GAME_SPEED)
 
 
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -113,32 +112,20 @@ def start_screen():
                     game_loop(ball,player1,player2,center)
 
 
-def pause_screen():
-    global player_returns, p1_speed, number_of_vollies, current_set, player_round_wins, player_set_wins, player1
+def pause_screen(p1_score):
+    global p1_speed, player1, round_data, session_data
 
+    if p1_score >= points_per_set:
+        session_data['player_set_wins'] += 1
 
+    print(session_data)
+    round_data = [0, 0, 0, 0]
 
     # Reset player
     player1.height = PADDLE_SIZE[1]
 
-    print("IN PAUSE SCREEN")
-    print(f"Advantage Level: {Advantage_level}")
-    print(f"Finished set: {current_set}")
-    print(f"Player return count for previous round: {player_returns}")
-    print(f"Volley count: {number_of_vollies}")
-    print(f"Rounds won by player: {player_round_wins}")
-    print(f"Did player win the set? {player_round_wins >= score_per_round}")
-
-    if player_round_wins >= score_per_round:
-        player_set_wins += 1
-
-    print(f"Total sets won by player: {player_set_wins}")
-
     p1_speed = 0
-    current_set += 1
-    player_returns = 0
-    number_of_vollies = 0
-    player_round_wins = 0
+    session_data['global_data']['current_set'] += 1
 
     display.fill(BLACK)
     pause_text = TEXT_FONT.render("BREAK SCREEN", True, WHITE)
@@ -161,29 +148,19 @@ def pause_screen():
                         pygame.event.clear(None)
                         return
 
-def end_screen():
-    global player_returns, p1_speed, number_of_vollies, current_set, player_round_wins, player_set_wins, player1
+def end_screen(p1_score):
+    global p1_speed, player1, round_data, session_data
+
+    if p1_score >= points_per_set:
+        session_data['player_set_wins'] += 1
+
+    print(session_data)
+    round_data = [0, 0, 0, 0]
 
     # Reset player
     player1.height = PADDLE_SIZE[1]
 
-    print("IN END SCREEN")
-    print(f"Finished set: {current_set}")
-    print(f"Player return count for previous round: {player_returns}")
-    print(f"Volley count: {number_of_vollies}")
-    print(f"Rounds won by player: {player_round_wins}")
-    print(f"Did player win the set? {player_round_wins >= score_per_round}")
-
-    if player_round_wins >= score_per_round:
-        player_set_wins += 1
-
-    print(f"Total sets won by player: {player_set_wins}")
-
     p1_speed = 0
-    current_set += 1
-    player_returns = 0
-    number_of_vollies = 0
-    player_round_wins = 0
 
     display.fill(BLACK)
     pause_text = TEXT_FONT.render("THE END", True, WHITE)
@@ -209,9 +186,9 @@ def end_screen():
 
 
 def game_loop(ball, player1, player2, center):
-    global p1_speed, p2_speed, p1_score, p2_score, ball_speed_x, ball_speed_y, score_time, WHITE, speed_mult, STARTING, player_returns, player_round_wins, number_of_vollies, Advantage_level, PADDLE_SIZE
+    global p1_speed, p2_speed, p1_score, p2_score, ball_speed_x, ball_speed_y, score_time, WHITE, speed_mult, STARTING, Advantage_level, PADDLE_SIZE, round_data, session_data
     game_sounds['bg_music'].play(-1)
-    test_round = True
+    test_round = 0
     animate = False
     goal_sound = True
     collision = 0
@@ -235,14 +212,14 @@ def game_loop(ball, player1, player2, center):
         if player_positions[1] != -1:
             player1.bottom = player_positions[1]
 
-        ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, collision, player_returns, number_of_vollies, player_round_wins, player1 = ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE, speed_mult, player_returns, number_of_vollies, player_round_wins, Advantage_level, game_sounds)
+        ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, collision, round_data[2], round_data[3], player1 = ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE, speed_mult, round_data[3], round_data[2], Advantage_level, game_sounds)
         ball.x += ball_speed_x
         ball.y += ball_speed_y
 
         #Draw visuals
         display.fill(BG_COLOR)
 
-        pygame.draw.aaline(display, WHITE, (SCREEN_SIZE[0]/2, 0),
+        pygame.draw.aaline(display, pygame.Color("gray45"), (SCREEN_SIZE[0]/2, 0),
                             (SCREEN_SIZE[0]/2, SCREEN_SIZE[1]))
 
         pygame.draw.ellipse(display, GREY, center)
@@ -260,6 +237,12 @@ def game_loop(ball, player1, player2, center):
             if (p1_score > 0 or p2_score > 0) and goal_sound:
                 goal_sound = False
                 game_sounds['goal_sound'].play()
+
+                round_data[0] += 1 # Round
+                round_data[1] = p1_score # Score
+                session_data['set_' + str(Advantage_level)].update({"round_" + str(round_data[0]): ["Player score: " + str(round_data[1]), "Player returns: " + str(round_data[2]), "Vollies: " + str(round_data[3])]})
+                round_data[2] = round_data[3] = 0
+
             ball_speed_x, ball_speed_y, score_time, animate, player1, goal_sound = ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE, speed_constant, animate, player1, PADDLE_SIZE[1], p1_score, p2_score, game_sounds, goal_sound)
 
         player1_text = TEXT_FONT.render(f"{p1_score}", True, WHITE)
@@ -271,17 +254,17 @@ def game_loop(ball, player1, player2, center):
         if p1_score >= points_per_set or p2_score >= points_per_set:
             p1_score,p2_score = 0,0
 
-            if test_round:
-                test_round = False
+            if test_round > 0:
+                test_round -= 1
             else:
                 Advantage_level += 1
 
             if Advantage_level <= 3:
                 game_sounds['bg_music'].stop()
-                pause_screen()
+                pause_screen(p1_score)
                 game_sounds['bg_music'].play(-1)
             else:
-                end_screen()
+                end_screen(p1_score)
 
 
             score_time = pygame.time.get_ticks()
@@ -294,9 +277,10 @@ def game_loop(ball, player1, player2, center):
 if __name__ == "__main__":
 
     # Initialize sounds
-    paddle_sound = pygame.mixer.Sound('paddle.mp3')
-    goal_sound = pygame.mixer.Sound('goal.mp3')
-    bg_music = pygame.mixer.Sound('music.mp3')
+    paddle_sound = pygame.mixer.Sound('data/paddle.mp3')
+    paddle_sound.set_volume(0.6)
+    goal_sound = pygame.mixer.Sound('data/goal.mp3')
+    bg_music = pygame.mixer.Sound('data/music.mp3')
     game_sounds = {"paddle_sound": paddle_sound,
                 "goal_sound": goal_sound,
                 "bg_music": bg_music}
