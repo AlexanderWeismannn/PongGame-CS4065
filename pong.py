@@ -1,8 +1,8 @@
 import pygame, sys, random
 from pygame.locals import *
-from data.ball_functions import ball_animation, ball_reset
-from data.player_functions import player_animation, user_input
-from data.particles import *
+from ball_functions import ball_animation, ball_reset
+from player_functions import player_animation, user_input
+from particles import *
 
 """
 Level 0: Test round, no advantages, no data collection

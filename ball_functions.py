@@ -1,6 +1,6 @@
 import pygame, sys, random
 from pygame.locals import *
-from data.particles import *
+from particles import *
 
 def ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE, speed_mult, player_returns, number_of_vollies, Advantage_level, game_sounds):
 
