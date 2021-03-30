@@ -8,8 +8,7 @@ from particles import *
 Level 0: Test round, no advantages, no data collection
 Level 0.5: No advantages, with data collection
 Level 1: Paddle can get 20% larger
-Level 2: Paddle can get 40% larger
-Level 3: Paddle can get 60% larger
+Level 2: Paddle can get 50% larger
 
 This way we're measuring both the effect of the advantage, as well as how far
 the advantage can be pushed before the player notices.
@@ -36,7 +35,10 @@ BLACK = pygame.Color("black")
 
 # Game settings
 points_per_set = 2
-Advantage_level = 0
+Advantage_level = [0, 2, 1]
+# Advantage_level = [1, 2]
+# random.shuffle(Advantage_level)
+# Advantage_level.insert(0,0)
 GAME_SPEED = 80
 score_time = True
 speed_constant = 8
@@ -51,10 +53,9 @@ player2_text = TEXT_FONT.render(f"{p2_score}", True, WHITE)
 # Data collection
 session_data = {"global_data": {"current_set": 0,
                                 "player_set_wins": 0},
-                "set_0": {},
-                "set_1": {},
-                "set_2": {},
-                "set_3": {}}
+                "advantage_0": {},
+                "advantage_1": {},
+                "advantage_2": {}}
 
 round_data = [0, 0, 0, 0]
 
@@ -188,6 +189,7 @@ def end_screen(p1_score):
 def game_loop(ball, player1, player2, center):
     global p1_speed, p2_speed, p1_score, p2_score, ball_speed_x, ball_speed_y, score_time, WHITE, speed_mult, STARTING, Advantage_level, PADDLE_SIZE, round_data, session_data
     game_sounds['bg_music'].play(-1)
+    level = 0
     test_round = 0
     animate = False
     goal_sound = True
@@ -212,7 +214,7 @@ def game_loop(ball, player1, player2, center):
         if player_positions[1] != -1:
             player1.bottom = player_positions[1]
 
-        ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, collision, round_data[2], round_data[3], player1 = ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE, speed_mult, round_data[3], round_data[2], Advantage_level, game_sounds)
+        ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, collision, round_data[2], round_data[3], player1 = ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE, speed_mult, round_data[3], round_data[2], Advantage_level, game_sounds, level)
         ball.x += ball_speed_x
         ball.y += ball_speed_y
 
@@ -240,7 +242,7 @@ def game_loop(ball, player1, player2, center):
 
                 round_data[0] += 1 # Round
                 round_data[1] = p1_score # Score
-                session_data['set_' + str(Advantage_level)].update({"round_" + str(round_data[0]): ["Player score: " + str(round_data[1]), "Player returns: " + str(round_data[2]), "Vollies: " + str(round_data[3])]})
+                session_data['advantage_' + str(Advantage_level[level])].update({"round_" + str(round_data[0]): ["Player score: " + str(round_data[1]), "Player returns: " + str(round_data[2]), "Vollies: " + str(round_data[3])]})
                 round_data[2] = round_data[3] = 0
 
             ball_speed_x, ball_speed_y, score_time, animate, player1, goal_sound = ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE, speed_constant, animate, player1, PADDLE_SIZE[1], p1_score, p2_score, game_sounds, goal_sound)
@@ -257,9 +259,9 @@ def game_loop(ball, player1, player2, center):
             if test_round > 0:
                 test_round -= 1
             else:
-                Advantage_level += 1
+                level += 1
 
-            if Advantage_level <= 3:
+            if level <= 2:
                 game_sounds['bg_music'].stop()
                 pause_screen(p1_score)
                 game_sounds['bg_music'].play(-1)

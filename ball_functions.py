@@ -2,7 +2,7 @@ import pygame, sys, random
 from pygame.locals import *
 from particles import *
 
-def ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE, speed_mult, player_returns, number_of_vollies, Advantage_level, game_sounds):
+def ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE, speed_mult, player_returns, number_of_vollies, Advantage_level, game_sounds, level):
 
     #collision logic
     if ball.top <= 0 or ball.bottom >= SCREEN_SIZE[1]:
@@ -46,17 +46,12 @@ def ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y
     if (previous_collide != 1) and (ball.colliderect(player2) and ball_speed_x > 0):
 
         # WARNING: this must only happen if advantage is set to true
-        if (Advantage_level == 1):
+        if (Advantage_level[level] == 1):
             if (player1.height < 144):
                 player1.height += 1
-        elif (Advantage_level == 2):
-            if (player1.height < 168):
-                player1.height += 2
-        elif (Advantage_level == 3):
-            if (player1.height < 192):
+        elif (Advantage_level[level] == 2):
+            if (player1.height < 180):
                 player1.height += 3
-            # if (player1.height < 192):
-            #     player1.height += 3
 
         game_sounds['paddle_sound'].play()
         collision = 1
