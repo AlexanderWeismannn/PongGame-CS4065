@@ -279,6 +279,7 @@ def game_loop(ball, player1, player2, center):
             if level <= 2:
                 game_sounds['bg_music'].stop()
                 pause_screen()
+                p1_speed = 0
                 game_sounds['bg_music'].play(-1)
                 time.sleep(0.1)
             else:

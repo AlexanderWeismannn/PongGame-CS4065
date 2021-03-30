@@ -30,10 +30,10 @@ def user_input(p1_speed):
 
             if event.key == pygame.K_s:
                 #move down
-                p1_speed += 10
+                p1_speed = 10
             if event.key == pygame.K_w:
                 #move up
-                p1_speed -= 10
+                p1_speed = -10
 
         #if the key has been released revert the speed back by the amount
         #it was increased by
@@ -41,8 +41,8 @@ def user_input(p1_speed):
 
             if event.key == pygame.K_s:
                 #move down
-                p1_speed -= 10
+                p1_speed = 0
             if event.key == pygame.K_w:
                 #move up
-                p1_speed += 10
+                p1_speed = 0
     return p1_speed
