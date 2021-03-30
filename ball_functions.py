@@ -2,7 +2,7 @@ import pygame, sys, random
 from pygame.locals import *
 from particles import *
 
-def ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE, speed_mult, player_returns, number_of_vollies, Advantage_level, game_sounds, level):
+def ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, SCREEN_SIZE, speed_mult, player_returns, Advantage_level, game_sounds, level, player_scored):
 
     #collision logic
     if ball.top <= 0 or ball.bottom >= SCREEN_SIZE[1]:
@@ -17,7 +17,7 @@ def ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y
     #P1 scores a goal
     if ball.right >= SCREEN_SIZE[0]+50:
         p1_score += 1
-        player_round_wins += 1
+        player_scored = "Player won this round"
         score_time = pygame.time.get_ticks()
 
     #paddle Collison
@@ -29,7 +29,6 @@ def ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y
 
     if (previous_collide != -1) and (ball.colliderect(player1) and ball_speed_x < 0):
         player_returns += 1
-        number_of_vollies += 1
         game_sounds['paddle_sound'].play()
         collision = -1
         previous_collide = -1
@@ -56,7 +55,6 @@ def ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y
         game_sounds['paddle_sound'].play()
         collision = 1
         previous_collide = 1
-        number_of_vollies += 1
         if (abs((ball.right - player2.right) < 10)) or (abs((ball.left - player2.right) < 10)):
             ball_speed_x += speed_mult
             ball_speed_x *= -1
@@ -67,7 +65,7 @@ def ball_animation(collision, ball, player1, player2, ball_speed_x, ball_speed_y
             ball_speed_y += speed_mult
             ball_speed_y *= -1
 
-    return ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, collision, player_returns, number_of_vollies, player1
+    return ball_speed_x, ball_speed_y, p1_score, p2_score, score_time, collision, player_returns, player1, player_scored
 
 def ball_reset(display, ball, ball_speed_x, ball_speed_y, score_time, TEXT_FONT, SCREEN_SIZE, WHITE, speed_constant, animate, player1, size, p1_score, p2_score, game_sounds, goal_sound):
 
