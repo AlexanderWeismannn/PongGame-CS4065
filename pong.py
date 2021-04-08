@@ -168,6 +168,10 @@ def end_screen():
 
     pprint.pprint(session_data)
     print("\n")
+
+    with open("data_" + str(time.time()).replace(".", "") + ".txt", "w") as fn:
+        pprint.pprint(session_data, fn)
+
     round_data = [0, 0, 0, 0]
 
     # Reset player
